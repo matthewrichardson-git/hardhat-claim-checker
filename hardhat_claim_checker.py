@@ -2,33 +2,187 @@ import streamlit as st
 
 st.set_page_config(page_title="HardHat Claim Checker", page_icon="🪖", layout="centered")
 
-NAVY = "#1B2A4A"
-ORANGE = "#F5A623"
+# ---------------- DESIGN TOKENS ----------------
+# "Site Diagnostics Terminal" — industrial-futurist, safety-orange on deep graphite
+INK = "#0A0F1E"        # page base
+PANEL = "#111A30"      # card surface
+PANEL_2 = "#0E1628"    # inset surface
+LINE = "#22304F"       # hairline borders
+ORANGE = "#FF8A00"     # signal / brand
+ORANGE_DIM = "#B35F00"
+TEXT = "#E8ECF4"
+MUTED = "#8A94AD"
+RED = "#FF4D4D"
+GREEN = "#3DDC97"
 
 st.markdown(f"""
 <style>
-    .stApp {{ background-color: #F4F6F9; }}
-    h1, h2, h3 {{ color: {NAVY}; }}
-    .hh-banner {{
-        background: {NAVY}; padding: 22px 26px; border-radius: 12px; margin-bottom: 18px;
-    }}
-    .hh-banner h1 {{ color: white; margin: 0; font-size: 30px; }}
-    .hh-banner p {{ color: {ORANGE}; margin: 4px 0 0 0; font-weight: 600; }}
-    .hh-result {{
-        background: white; border-left: 6px solid {ORANGE}; padding: 18px 22px;
-        border-radius: 8px; margin: 10px 0; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    }}
-    .stButton>button {{
-        background: {ORANGE}; color: {NAVY}; font-weight: 700; border: none;
-        padding: 10px 26px; border-radius: 8px;
-    }}
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ---------- base ---------- */
+.stApp {{
+    background:
+        radial-gradient(1100px 500px at 50% -10%, rgba(255,138,0,0.07), transparent 60%),
+        linear-gradient(180deg, #0B1122 0%, {INK} 40%);
+    color: {TEXT};
+}}
+html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
+h1, h2, h3 {{
+    font-family: 'Chakra Petch', sans-serif !important;
+    color: {TEXT} !important;
+    letter-spacing: 0.02em;
+}}
+p, li, label {{ color: {TEXT}; }}
+hr {{ border-color: {LINE}; }}
+
+/* ---------- banner ---------- */
+.hh-banner {{
+    position: relative;
+    background: linear-gradient(135deg, {PANEL} 0%, {PANEL_2} 100%);
+    border: 1px solid {LINE};
+    border-top: 2px solid {ORANGE};
+    border-radius: 14px;
+    padding: 30px 32px 26px;
+    margin-bottom: 22px;
+    overflow: hidden;
+}}
+.hh-banner::after {{
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,138,0,0.10), transparent);
+    transform: translateX(-100%);
+    animation: hh-sweep 5s ease-in-out infinite;
+    pointer-events: none;
+}}
+@keyframes hh-sweep {{
+    0%   {{ transform: translateX(-100%); }}
+    45%  {{ transform: translateX(100%); }}
+    100% {{ transform: translateX(100%); }}
+}}
+@media (prefers-reduced-motion: reduce) {{
+    .hh-banner::after {{ animation: none; }}
+}}
+.hh-eyebrow {{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: {ORANGE};
+    text-transform: uppercase;
+    margin: 0 0 8px 0;
+}}
+.hh-banner h1 {{
+    color: {TEXT} !important;
+    margin: 0;
+    font-size: 34px;
+    font-weight: 700;
+    line-height: 1.1;
+}}
+.hh-banner .hh-sub {{
+    color: {MUTED};
+    margin: 10px 0 0 0;
+    font-size: 15px;
+}}
+.hh-banner .hh-sub b {{ color: {TEXT}; }}
+
+/* ---------- readout cards (signature element) ---------- */
+.hh-result {{
+    position: relative;
+    background: {PANEL};
+    border: 1px solid {LINE};
+    border-radius: 10px;
+    padding: 20px 24px 18px;
+    margin: 14px 0;
+}}
+.hh-result::before {{
+    /* corner bracket, top-left */
+    content: "";
+    position: absolute; top: -1px; left: -1px;
+    width: 22px; height: 22px;
+    border-top: 2px solid {ORANGE};
+    border-left: 2px solid {ORANGE};
+    border-top-left-radius: 10px;
+}}
+.hh-result::after {{
+    /* corner bracket, bottom-right */
+    content: "";
+    position: absolute; bottom: -1px; right: -1px;
+    width: 22px; height: 22px;
+    border-bottom: 2px solid {ORANGE};
+    border-right: 2px solid {ORANGE};
+    border-bottom-right-radius: 10px;
+}}
+.hh-result.hh-alert::before, .hh-result.hh-alert::after {{ border-color: {RED}; }}
+.hh-result.hh-ok::before, .hh-result.hh-ok::after {{ border-color: {GREEN}; }}
+.hh-tag {{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: {MUTED};
+    margin: 0 0 6px 0;
+}}
+.hh-tag span {{ color: {ORANGE}; }}
+.hh-result.hh-alert .hh-tag span {{ color: {RED}; }}
+.hh-result.hh-ok .hh-tag span {{ color: {GREEN}; }}
+.hh-result h3 {{
+    margin: 0 0 8px 0;
+    font-size: 19px;
+}}
+.hh-result p {{ color: {MUTED}; margin: 6px 0; line-height: 1.55; }}
+.hh-result p b {{ color: {TEXT}; }}
+
+/* ---------- form ---------- */
+[data-testid="stForm"] {{
+    background: {PANEL_2};
+    border: 1px solid {LINE};
+    border-radius: 14px;
+    padding: 26px 26px 20px;
+}}
+.stSelectbox label, .stRadio label, .stSlider label {{
+    color: {MUTED} !important;
+    font-weight: 500;
+}}
+[data-baseweb="select"] > div {{
+    background: {PANEL} !important;
+    border-color: {LINE} !important;
+    color: {TEXT} !important;
+}}
+.stRadio [role="radiogroup"] label {{ color: {TEXT} !important; }}
+
+/* ---------- buttons ---------- */
+.stButton>button, [data-testid="stForm"] button {{
+    background: linear-gradient(180deg, {ORANGE}, {ORANGE_DIM});
+    color: {INK};
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 18px rgba(255,138,0,0.35);
+    transition: box-shadow 0.2s ease, transform 0.1s ease;
+}}
+.stButton>button:hover, [data-testid="stForm"] button:hover {{
+    box-shadow: 0 0 28px rgba(255,138,0,0.55);
+    transform: translateY(-1px);
+    color: {INK};
+}}
+.stButton>button:focus-visible {{
+    outline: 2px solid {TEXT};
+    outline-offset: 2px;
+}}
+
+/* ---------- misc ---------- */
+.stCaption, [data-testid="stCaptionContainer"] p {{ color: {MUTED} !important; }}
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown("""
 <div class="hh-banner">
+    <p class="hh-eyebrow">HardHat // Claim Diagnostics</p>
     <h1>🪖 HardHat Claim Checker</h1>
-    <p>Workers' comp, made clear. Answer 6 quick questions.</p>
+    <p class="hh-sub">Workers' comp, made clear. <b>Answer 6 quick questions</b> and get your readout.</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -87,16 +241,22 @@ if submitted:
         caveats.append("Office injuries are absolutely covered too. Workers' comp isn't just for job sites.")
 
     if likely:
-        st.markdown(f"""<div class="hh-result"><h3>✅ You likely have a valid claim</h3>
+        st.markdown(f"""<div class="hh-result hh-ok">
+        <p class="hh-tag">Status // <span>Claim viability</span></p>
+        <h3>✅ You likely have a valid claim</h3>
         <p>Nearly every employer in {state if state != 'Other / not listed' else 'the U.S.'} is required to carry workers' compensation coverage.
         An injury that happened at work or because of work is generally covered, including {injury.lower().split('(')[0].strip()} injuries.
-        You do NOT have to prove your employer did anything wrong. Comp is no-fault.</p></div>""", unsafe_allow_html=True)
+        You do <b>NOT</b> have to prove your employer did anything wrong. Comp is no-fault.</p></div>""", unsafe_allow_html=True)
     else:
-        st.markdown("""<div class="hh-result"><h3>⚠️ Your window may be closing or closed</h3>
+        st.markdown("""<div class="hh-result hh-alert">
+        <p class="hh-tag">Status // <span>Claim viability</span></p>
+        <h3>⚠️ Your window may be closing or closed</h3>
         <p>Based on the timing you selected, the standard filing deadline may have passed. There are exceptions (late discovery, employer misconduct, ongoing benefits), so don't assume it's over. Talk to someone.</p></div>""", unsafe_allow_html=True)
 
     # ---- 2. Deadlines ----
-    st.markdown(f"""<div class="hh-result"><h3>⏰ Deadlines in your state</h3>
+    st.markdown(f"""<div class="hh-result">
+    <p class="hh-tag">Timeline // <span>{state}</span></p>
+    <h3>⏰ Deadlines in your state</h3>
     <p>{rules['note']}</p></div>""", unsafe_allow_html=True)
 
     # ---- 3. Next 3 steps ----
@@ -109,17 +269,23 @@ if submitted:
         steps.append("Keep every document: medical bills, work restrictions, pay stubs showing missed time.")
 
     steps_html = "".join([f"<p><b>{i+1}.</b> {s}</p>" for i, s in enumerate(steps[:3])])
-    st.markdown(f"""<div class="hh-result"><h3>👉 Your next 3 steps</h3>{steps_html}</div>""", unsafe_allow_html=True)
+    st.markdown(f"""<div class="hh-result">
+    <p class="hh-tag">Action plan // <span>Next 72 hours</span></p>
+    <h3>👉 Your next 3 steps</h3>{steps_html}</div>""", unsafe_allow_html=True)
 
     # ---- 4. Attorney trigger ----
     complex_flags = {"My claim was denied", "I think I'm being punished for reporting", "The injury looks permanent"}
     if status in complex_flags or not likely:
-        st.markdown("""<div class="hh-result" style="border-left-color:#C0392B;"><h3>⚖️ Talk to an attorney. Seriously.</h3>
+        st.markdown("""<div class="hh-result hh-alert">
+        <p class="hh-tag">Escalation // <span>Representation advised</span></p>
+        <h3>⚖️ Talk to an attorney. Seriously.</h3>
         <p>Your situation shows the signals (denial, retaliation, permanent injury, or deadline risk) where workers who get representation
         do meaningfully better. Workers' comp attorneys work on contingency: free consult, no fee unless you recover.
         In the full HardHat product, this is where we'd match you with a vetted attorney in your state.</p></div>""", unsafe_allow_html=True)
     else:
-        st.markdown("""<div class="hh-result"><h3>💪 You can likely handle this stage yourself</h3>
+        st.markdown("""<div class="hh-result hh-ok">
+        <p class="hh-tag">Escalation // <span>Not needed yet</span></p>
+        <h3>💪 You can likely handle this stage yourself</h3>
         <p>Straightforward, reported, recent claims usually don't need a lawyer. If your claim gets denied, payments stop,
         or your employer pushes back, that's when to get one. HardHat will be here for that moment.</p></div>""", unsafe_allow_html=True)
 
