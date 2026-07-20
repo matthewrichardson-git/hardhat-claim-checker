@@ -4,22 +4,43 @@ import streamlit as st
 st.set_page_config(page_title="HardHat — Workers' comp, made clear", page_icon="🪖", layout="wide")
 
 # ============================================================
-# HARDHAT — premium dark product site
-# Structure: Home / About / Why Use It / Purpose / Claim Checker / Success Stories
-# Design system: #09090B base, glass cards, electric blue accent,
-# Inter typography, 8px grid, subtle purposeful motion.
-# The Claim Checker logic (assignment functionality) is unchanged.
+# HARDHAT — product site
+# Pages: Home / About / Why Use It / Purpose / Claim Checker / Success Stories
+# Claim Checker logic (assignment functionality) is unchanged.
 # ============================================================
 BG = "#09090B"
-BG2 = "#111114"
-CARD = "#18181B"
-BORDER = "rgba(255,255,255,0.08)"
+BORDER = "rgba(255,255,255,0.09)"
 TEXT = "#FAFAFA"
-MUTED = "#9CA0AB"
+MUTED = "#9BA0AC"
 ACCENT = "#3B82F6"
-ACCENT_2 = "#38E1D4"
 GOOD = "#30D158"
 WARN = "#FF6B6B"
+
+
+# ---------- inline SVG icon set (lucide-style strokes, no emojis) ----------
+def icon(name, color=ACCENT, size=22):
+    paths = {
+        "hardhat": '<path d="M2 18a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v2z"/><path d="M10 10V5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5"/><path d="M4 15v-3a6 6 0 0 1 6-6"/><path d="M14 6a6 6 0 0 1 6 6v3"/>',
+        "clock": '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+        "shield": '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+        "zap": '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
+        "check": '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>',
+        "alert": '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+        "clipboard": '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>',
+        "compass": '<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>',
+        "target": '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+        "lock": '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+        "phone": '<rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/>',
+        "users": '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+        "briefcase": '<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+        "trend": '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>',
+        "pin": '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+        "arrow": '<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>',
+    }
+    return (f'<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" '
+            f'stroke="{color}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" '
+            f'aria-hidden="true">{paths[name]}</svg>')
+
 
 st.markdown(f"""
 <style>
@@ -28,8 +49,7 @@ st.markdown(f"""
 /* ---------- foundation ---------- */
 .stApp {{
     background:
-        radial-gradient(1000px 520px at 75% -10%, rgba(59,130,246,0.10), transparent 60%),
-        radial-gradient(700px 460px at 5% 5%, rgba(56,225,212,0.05), transparent 55%),
+        radial-gradient(900px 480px at 70% -14%, rgba(59,130,246,0.07), transparent 60%),
         {BG};
     color: {TEXT};
 }}
@@ -40,16 +60,19 @@ html, body, [class*="css"] {{
 h1, h2, h3, h4 {{ color: {TEXT} !important; letter-spacing: -0.02em; }}
 p, li, label {{ color: {TEXT}; }}
 hr {{ border-color: {BORDER}; margin: 32px 0; }}
-.block-container {{ padding-top: 24px; max-width: 1040px; }}
+
+/* push content below Streamlit's fixed header so the nav is fully visible */
+.block-container {{ padding-top: 5.5rem; max-width: 1040px; }}
+[data-testid="stHeader"] {{
+    background: rgba(9,9,11,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}}
 
 /* ---------- motion ---------- */
 @keyframes riseIn {{
-    from {{ opacity: 0; transform: translateY(16px); }}
+    from {{ opacity: 0; transform: translateY(14px); }}
     to   {{ opacity: 1; transform: translateY(0); }}
-}}
-@keyframes floatGlow {{
-    0%, 100% {{ opacity: 0.5; transform: translateY(0); }}
-    50%      {{ opacity: 0.9; transform: translateY(-8px); }}
 }}
 @media (prefers-reduced-motion: reduce) {{
     * {{ animation: none !important; transition: none !important; }}
@@ -57,191 +80,225 @@ hr {{ border-color: {BORDER}; margin: 32px 0; }}
 
 /* ---------- nav (styled tabs) ---------- */
 .stTabs [data-baseweb="tab-list"] {{
-    background: rgba(17,17,20,0.75);
+    background: rgba(17,17,20,0.92);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid {BORDER};
-    border-radius: 100px;
+    border-radius: 12px;
     padding: 6px;
     gap: 2px;
     justify-content: center;
-    position: sticky; top: 8px; z-index: 999;
+    position: sticky;
+    top: 4.25rem;              /* sits below Streamlit's header, never clipped */
+    z-index: 999;
+    margin-bottom: 8px;
 }}
 .stTabs [data-baseweb="tab"] {{
     color: {MUTED};
     font-weight: 500;
     font-size: 14px;
-    border-radius: 100px;
-    padding: 8px 18px;
+    border-radius: 8px;
+    padding: 8px 16px;
     background: transparent;
-    transition: color 0.2s ease, background 0.2s ease;
+    transition: color 0.15s ease, background 0.15s ease;
 }}
-.stTabs [data-baseweb="tab"]:hover {{ color: {TEXT}; }}
+.stTabs [data-baseweb="tab"]:hover {{ color: {TEXT}; background: rgba(255,255,255,0.04); }}
 .stTabs [aria-selected="true"] {{
     color: {TEXT} !important;
-    background: rgba(59,130,246,0.15) !important;
+    background: rgba(59,130,246,0.14) !important;
 }}
 .stTabs [data-baseweb="tab-highlight"], .stTabs [data-baseweb="tab-border"] {{ display: none; }}
 
 /* ---------- hero ---------- */
 .hh-hero {{
-    position: relative;
-    padding: 72px 8px 56px;
+    padding: 64px 8px 48px;
     text-align: center;
-    animation: riseIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: riseIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }}
-.hh-hero .orb {{
-    position: absolute; top: 0; left: 50%;
-    width: 280px; height: 280px; transform: translateX(-50%);
-    background: radial-gradient(circle, rgba(59,130,246,0.20), transparent 65%);
-    filter: blur(32px);
-    animation: floatGlow 8s ease-in-out infinite;
-    pointer-events: none;
-}}
+.hh-hero .mark {{ margin-bottom: 20px; }}
 .hh-eyebrow {{
     display: inline-block;
     font-size: 12px; font-weight: 600;
     letter-spacing: 0.14em; text-transform: uppercase;
     color: {ACCENT};
-    background: rgba(59,130,246,0.10);
-    border: 1px solid rgba(59,130,246,0.25);
-    border-radius: 100px;
-    padding: 6px 14px; margin-bottom: 24px;
+    border: 1px solid rgba(59,130,246,0.3);
+    border-radius: 6px;
+    padding: 5px 12px; margin-bottom: 22px;
 }}
 .hh-hero h1 {{
-    font-size: 56px; font-weight: 800;
-    line-height: 1.05; letter-spacing: -0.035em;
-    margin: 0 0 20px;
-    background: linear-gradient(180deg, {TEXT} 55%, #A9ADB8);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-size: 54px; font-weight: 800;
+    line-height: 1.06; letter-spacing: -0.035em;
+    margin: 0 0 18px;
 }}
 .hh-hero .sub {{
-    font-size: 18px; color: {MUTED};
+    font-size: 17px; color: {MUTED};
     max-width: 520px; margin: 0 auto; line-height: 1.65;
 }}
 .hh-hero .sub b {{ color: {TEXT}; font-weight: 600; }}
 @media (max-width: 640px) {{
-    .hh-hero h1 {{ font-size: 36px; }}
-    .hh-hero {{ padding: 48px 0 40px; }}
+    .hh-hero h1 {{ font-size: 34px; }}
+    .hh-hero {{ padding: 40px 0 32px; }}
 }}
 
-/* ---------- section scaffolding ---------- */
-.hh-section {{ padding: 40px 0 8px; animation: riseIn 0.6s cubic-bezier(0.16,1,0.3,1) both; }}
+/* ---------- sections ---------- */
+.hh-section {{ padding: 36px 0 8px; animation: riseIn 0.55s cubic-bezier(0.16,1,0.3,1) both; }}
 .hh-kicker {{
     font-size: 12px; font-weight: 600;
     letter-spacing: 0.14em; text-transform: uppercase;
     color: {ACCENT}; margin-bottom: 10px;
 }}
-.hh-h2 {{
-    font-size: 32px; font-weight: 700;
-    letter-spacing: -0.025em; margin: 0 0 12px;
-}}
+.hh-h2 {{ font-size: 30px; font-weight: 700; letter-spacing: -0.025em; margin: 0 0 12px; }}
 .hh-lede {{ font-size: 16px; color: {MUTED}; line-height: 1.7; max-width: 640px; }}
 .hh-lede b {{ color: {TEXT}; }}
 
 /* ---------- cards ---------- */
 .hh-card {{
-    background: rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.03);
     border: 1px solid {BORDER};
-    border-radius: 20px;
-    padding: 24px 26px;
+    border-radius: 14px;
+    padding: 22px 24px;
     margin: 8px 0 16px;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
-    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
     height: 100%;
 }}
 .hh-card:hover {{
-    transform: translateY(-3px);
-    border-color: rgba(59,130,246,0.35);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.45);
+    transform: translateY(-2px);
+    border-color: rgba(59,130,246,0.4);
+    background: rgba(255,255,255,0.045);
 }}
-.hh-card .icon {{ font-size: 26px; margin-bottom: 12px; }}
+.hh-card .icon {{ margin-bottom: 14px; }}
 .hh-card h3 {{ font-size: 17px; font-weight: 600; margin: 0 0 8px; }}
 .hh-card h4 {{ font-size: 15px; font-weight: 600; margin: 0 0 6px; }}
 .hh-card p {{ color: {MUTED}; font-size: 14.5px; line-height: 1.65; margin: 6px 0; }}
 .hh-card p b {{ color: {TEXT}; font-weight: 600; }}
+.hh-card.ghost {{
+    border-style: dashed;
+    border-color: rgba(255,255,255,0.14);
+    background: transparent;
+    text-align: center;
+    display: flex; flex-direction: column; justify-content: center;
+    min-height: 180px;
+}}
+.hh-card.ghost:hover {{ border-color: rgba(59,130,246,0.4); transform: none; }}
 .hh-pill {{
     display: inline-block;
     font-size: 11px; font-weight: 600;
     letter-spacing: 0.1em; text-transform: uppercase;
-    border-radius: 100px; padding: 4px 12px; margin-bottom: 12px;
+    border-radius: 6px; padding: 4px 10px; margin-bottom: 12px;
 }}
-.hh-pill.blue {{ color: {ACCENT}; background: rgba(59,130,246,0.10); border: 1px solid rgba(59,130,246,0.25); }}
-.hh-pill.good {{ color: {GOOD}; background: rgba(48,209,88,0.10); border: 1px solid rgba(48,209,88,0.25); }}
-.hh-pill.warn {{ color: {WARN}; background: rgba(255,107,107,0.10); border: 1px solid rgba(255,107,107,0.28); }}
+.hh-pill.blue {{ color: {ACCENT}; border: 1px solid rgba(59,130,246,0.3); }}
+.hh-pill.good {{ color: {GOOD}; border: 1px solid rgba(48,209,88,0.3); }}
+.hh-pill.warn {{ color: {WARN}; border: 1px solid rgba(255,107,107,0.32); }}
+.hh-pill.grey {{ color: {MUTED}; border: 1px solid {BORDER}; }}
+
+/* result card headers: icon + title on one line */
+.hh-rhead {{ display: flex; align-items: center; gap: 10px; margin: 0 0 8px; }}
+.hh-rhead h3 {{ margin: 0; }}
+
+/* ---------- steps ---------- */
+.hh-step {{ display: flex; gap: 16px; padding: 8px 0 20px; }}
+.hh-step .n {{
+    flex: none;
+    width: 34px; height: 34px;
+    border: 1px solid rgba(59,130,246,0.4);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: {ACCENT};
+    font-variant-numeric: tabular-nums;
+}}
+.hh-step h4 {{ margin: 4px 0 4px; font-size: 16px; }}
+.hh-step p {{ color: {MUTED}; font-size: 14.5px; line-height: 1.6; margin: 0; }}
 
 /* ---------- stats ---------- */
 .hh-stat {{
-    text-align: center; padding: 20px 8px;
+    text-align: center; padding: 22px 8px;
+    border: 1px solid {BORDER}; border-radius: 14px;
+    background: rgba(255,255,255,0.02);
+    transition: border-color 0.2s ease;
 }}
+.hh-stat:hover {{ border-color: rgba(59,130,246,0.35); }}
 .hh-stat .num {{
-    font-size: 40px; font-weight: 800; letter-spacing: -0.03em;
-    background: linear-gradient(135deg, {ACCENT}, {ACCENT_2});
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    font-size: 36px; font-weight: 800; letter-spacing: -0.03em;
+    color: {TEXT}; font-variant-numeric: tabular-nums;
 }}
 .hh-stat .lbl {{ font-size: 13px; color: {MUTED}; margin-top: 4px; }}
 
 /* ---------- timeline ---------- */
-.hh-tl {{ border-left: 2px solid rgba(59,130,246,0.3); margin: 8px 0 8px 8px; padding-left: 24px; }}
-.hh-tl .item {{ position: relative; padding-bottom: 24px; }}
+.hh-tl {{ border-left: 1px solid rgba(59,130,246,0.35); margin: 8px 0 8px 8px; padding-left: 26px; }}
+.hh-tl .item {{ position: relative; padding-bottom: 26px; }}
 .hh-tl .item::before {{
-    content: ""; position: absolute; left: -31px; top: 4px;
-    width: 12px; height: 12px; border-radius: 50%;
-    background: {ACCENT}; box-shadow: 0 0 0 4px rgba(59,130,246,0.2);
+    content: ""; position: absolute; left: -31px; top: 5px;
+    width: 9px; height: 9px; border-radius: 50%;
+    background: {BG}; border: 2px solid {ACCENT};
 }}
 .hh-tl .when {{ font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: {ACCENT}; }}
 .hh-tl h4 {{ margin: 4px 0 4px; font-size: 16px; }}
 .hh-tl p {{ color: {MUTED}; font-size: 14.5px; line-height: 1.6; margin: 0; }}
 
+/* ---------- confidence bar ---------- */
+.hh-bar {{
+    height: 6px; border-radius: 100px;
+    background: rgba(255,255,255,0.08);
+    overflow: hidden; margin: 12px 0 4px;
+}}
+.hh-bar .fill {{
+    height: 100%; border-radius: 100px;
+    background: {ACCENT};
+    transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
+}}
+
 /* ---------- form ---------- */
 [data-testid="stForm"] {{
-    background: rgba(255,255,255,0.04);
+    background: rgba(255,255,255,0.03);
     border: 1px solid {BORDER};
-    border-radius: 24px;
+    border-radius: 16px;
     padding: 32px 32px 24px;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
 }}
 .stSelectbox label, .stRadio > label, .stSlider label {{
     color: {MUTED} !important; font-size: 14px !important; font-weight: 500 !important;
 }}
 [data-baseweb="select"] > div {{
-    background: rgba(255,255,255,0.05) !important;
+    background: rgba(255,255,255,0.04) !important;
     border-color: {BORDER} !important;
-    border-radius: 12px !important;
+    border-radius: 10px !important;
     color: {TEXT} !important;
-    transition: border-color 0.2s ease;
+    transition: border-color 0.15s ease;
 }}
-[data-baseweb="select"] > div:hover {{ border-color: rgba(59,130,246,0.4) !important; }}
+[data-baseweb="select"] > div:hover {{ border-color: rgba(59,130,246,0.45) !important; }}
 .stRadio [role="radiogroup"] label {{ color: {TEXT} !important; }}
+
+/* ---------- expanders ---------- */
+[data-testid="stExpander"] {{
+    border: 1px solid {BORDER};
+    border-radius: 12px;
+    background: rgba(255,255,255,0.02);
+    margin-bottom: 8px;
+}}
+[data-testid="stExpander"] summary {{ font-weight: 500; }}
+[data-testid="stExpander"] summary:hover {{ color: {ACCENT} !important; }}
 
 /* ---------- buttons ---------- */
 .stButton>button, [data-testid="stForm"] button {{
-    background: linear-gradient(135deg, {ACCENT}, {ACCENT_2});
-    color: #05070D;
-    font-weight: 700; font-size: 15px; letter-spacing: -0.01em;
-    border: none; padding: 12px 32px; border-radius: 100px;
-    box-shadow: 0 4px 20px rgba(59,130,246,0.35);
-    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+    background: {ACCENT};
+    color: #FFFFFF;
+    font-weight: 600; font-size: 15px; letter-spacing: -0.01em;
+    border: none; padding: 11px 28px; border-radius: 10px;
+    transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.2s ease;
 }}
 .stButton>button:hover, [data-testid="stForm"] button:hover {{
-    transform: scale(1.03);
-    box-shadow: 0 6px 28px rgba(59,130,246,0.5);
-    filter: brightness(1.05);
-    color: #05070D;
+    background: #2F6FE0;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(59,130,246,0.3);
+    color: #FFFFFF;
 }}
-.stButton>button:active, [data-testid="stForm"] button:active {{ transform: scale(0.98); }}
+.stButton>button:active, [data-testid="stForm"] button:active {{ transform: translateY(0); }}
 .stButton>button:focus-visible, [data-testid="stForm"] button:focus-visible {{
     outline: 2px solid {TEXT}; outline-offset: 3px;
 }}
 
 /* ---------- slider, captions, footer ---------- */
 .stSlider [data-baseweb="slider"] div[role="slider"] {{
-    background: {ACCENT}; box-shadow: 0 0 0 4px rgba(59,130,246,0.25);
+    background: {ACCENT}; box-shadow: 0 0 0 4px rgba(59,130,246,0.22);
 }}
 .stCaption, [data-testid="stCaptionContainer"] p {{ color: {MUTED} !important; font-size: 13px !important; }}
 .hh-footer {{
@@ -249,9 +306,7 @@ hr {{ border-color: {BORDER}; margin: 32px 0; }}
     margin-top: 48px; padding: 32px 8px 16px;
     text-align: center; color: {MUTED}; font-size: 13px; line-height: 2;
 }}
-.hh-footer .logo {{ font-weight: 800; font-size: 16px; color: {TEXT}; letter-spacing: -0.02em; }}
-.hh-footer a {{ color: {MUTED}; text-decoration: none; margin: 0 10px; }}
-.hh-footer a:hover {{ color: {TEXT}; }}
+.hh-footer .logo {{ font-weight: 700; font-size: 15px; color: {TEXT}; letter-spacing: -0.02em; }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -274,6 +329,13 @@ STATE_RULES = {
 }
 
 
+def card(pill_class, pill_text, icon_name, title, body_html, icon_color=ACCENT):
+    st.markdown(f"""<div class="hh-card">
+    <span class="hh-pill {pill_class}">{pill_text}</span>
+    <div class="hh-rhead">{icon(icon_name, icon_color)}<h3>{title}</h3></div>
+    {body_html}</div>""", unsafe_allow_html=True)
+
+
 # ============================================================
 # NAVIGATION
 # ============================================================
@@ -286,30 +348,30 @@ tab_home, tab_about, tab_why, tab_purpose, tab_checker, tab_stories = st.tabs(
 # HOME
 # ============================================================
 with tab_home:
-    st.markdown("""
+    st.markdown(f"""
     <div class="hh-hero">
-        <div class="orb"></div>
-        <span class="hh-eyebrow">HardHat 🪖</span>
+        <div class="mark">{icon("hardhat", ACCENT, 40)}</div>
+        <div><span class="hh-eyebrow">HardHat</span></div>
         <h1>Workers' comp,<br>made clear.</h1>
         <p class="sub">You got hurt doing your job. Figuring out what happens next shouldn't
         take a law degree. <b>Six questions. Two minutes. A clear readout.</b></p>
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown('<p style="text-align:center; color:#9CA0AB; font-size:14px;">Open the <b style="color:#FAFAFA;">Claim Checker</b> tab above to get your readout →</p>', unsafe_allow_html=True)
+    st.markdown(f'<p style="text-align:center; color:{MUTED}; font-size:14px;">Open the <b style="color:{TEXT};">Claim Checker</b> tab above to get your readout</p>', unsafe_allow_html=True)
 
     # ---- stats ----
     s1, s2, s3, s4 = st.columns(4)
-    with s1:
-        st.markdown('<div class="hh-stat"><div class="num">6</div><div class="lbl">Questions, plain English</div></div>', unsafe_allow_html=True)
-    with s2:
-        st.markdown('<div class="hh-stat"><div class="num">&lt;2 min</div><div class="lbl">To a full readout</div></div>', unsafe_allow_html=True)
-    with s3:
-        st.markdown('<div class="hh-stat"><div class="num">5</div><div class="lbl">States covered at launch</div></div>', unsafe_allow_html=True)
-    with s4:
-        st.markdown('<div class="hh-stat"><div class="num">$0</div><div class="lbl">Free. No signup.</div></div>', unsafe_allow_html=True)
+    for col, num, lbl in [
+        (s1, "6", "Questions, plain English"),
+        (s2, "&lt;2 min", "To a full readout"),
+        (s3, "5", "States covered at launch"),
+        (s4, "$0", "Free. No signup."),
+    ]:
+        with col:
+            st.markdown(f'<div class="hh-stat"><div class="num">{num}</div><div class="lbl">{lbl}</div></div>', unsafe_allow_html=True)
 
-    # ---- how it works ----
+    # ---- how it works (a true sequence, so numbered) ----
     st.markdown("""
     <div class="hh-section">
         <div class="hh-kicker">How it works</div>
@@ -318,17 +380,17 @@ with tab_home:
     """, unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.markdown("""<div class="hh-card"><div class="icon">📝</div>
-        <h3>1 · Answer six questions</h3>
-        <p>Your state, your industry, your injury, and where things stand. Plain-English dropdowns, nothing to type.</p></div>""", unsafe_allow_html=True)
+        st.markdown("""<div class="hh-step"><div class="n">1</div><div>
+        <h4>Answer six questions</h4>
+        <p>Your state, your industry, your injury, and where things stand. Plain-English dropdowns, nothing to type.</p></div></div>""", unsafe_allow_html=True)
     with c2:
-        st.markdown("""<div class="hh-card"><div class="icon">⚡</div>
-        <h3>2 · Get your readout</h3>
-        <p>Whether you likely have a claim, the deadlines in your state, and your next three steps, instantly.</p></div>""", unsafe_allow_html=True)
+        st.markdown("""<div class="hh-step"><div class="n">2</div><div>
+        <h4>Get your readout</h4>
+        <p>Whether you likely have a claim, the deadlines in your state, and your next three steps, instantly.</p></div></div>""", unsafe_allow_html=True)
     with c3:
-        st.markdown("""<div class="hh-card"><div class="icon">🧭</div>
-        <h3>3 · Know your next move</h3>
-        <p>Most claims can be handled solo. When yours shows the signals that need a lawyer, we tell you straight.</p></div>""", unsafe_allow_html=True)
+        st.markdown("""<div class="hh-step"><div class="n">3</div><div>
+        <h4>Know your next move</h4>
+        <p>Most claims can be handled solo. When yours shows the signals that need a lawyer, we tell you straight.</p></div></div>""", unsafe_allow_html=True)
 
     # ---- why it matters ----
     st.markdown("""
@@ -344,20 +406,35 @@ with tab_home:
 
     f1, f2 = st.columns(2)
     with f1:
-        st.markdown("""<div class="hh-card"><div class="icon">⏱️</div>
+        st.markdown(f"""<div class="hh-card"><div class="icon">{icon("clock")}</div>
         <h3>Deadlines are brutal</h3>
         <p>Some states expect notice in days, not months. Missing the window can cost you the entire claim. HardHat surfaces your state's clock immediately.</p></div>""", unsafe_allow_html=True)
     with f2:
-        st.markdown("""<div class="hh-card"><div class="icon">🛡️</div>
+        st.markdown(f"""<div class="hh-card"><div class="icon">{icon("shield")}</div>
         <h3>It's no-fault</h3>
         <p>You don't have to prove your employer did anything wrong, and filing isn't suing anyone. Most workers don't know that. Now you do.</p></div>""", unsafe_allow_html=True)
 
-with tab_home:
+    # ---- FAQ (interactive) ----
     st.markdown("""
+    <div class="hh-section">
+        <div class="hh-kicker">Common questions</div>
+        <div class="hh-h2">Before you ask.</div>
+    </div>
+    """, unsafe_allow_html=True)
+    with st.expander("Is this legal advice?"):
+        st.write("No. HardHat provides general information about how workers' compensation works and what deadlines apply in your state. Every situation is different, and complex situations deserve a real attorney, which is exactly what the readout will tell you when it applies.")
+    with st.expander("Do I have to sue my employer to get workers' comp?"):
+        st.write("No, and this is the biggest myth in the system. Workers' comp is no-fault insurance your employer is already required to carry. Filing a claim is using coverage that exists for you, not taking anyone to court.")
+    with st.expander("What if I haven't reported my injury yet?"):
+        st.write("Report it in writing as soon as possible. A text or email counts, and you should keep a copy. Notice windows in some states are as short as a few days, and the readout will show you exactly where your state's clock stands.")
+    with st.expander("What happens to my answers?"):
+        st.write("Your answers generate your readout and an anonymous usefulness rating for the pilot. Nothing is stored against your name, and nothing is sold to law firms.")
+
+    st.markdown(f"""
     <div class="hh-footer">
-        <div class="logo">🪖 HardHat</div>
+        <div class="logo">HardHat</div>
         <div>Home · About · Why Use It · Purpose · Claim Checker · Success Stories</div>
-        <div>Contact: via the ENT 451 course portal · Privacy · Terms</div>
+        <div>Contact via the ENT 451 course portal · Privacy · Terms</div>
         <div>© 2026 HardHat · Built by Matthew Richardson · University of Tennessee</div>
         <div>Informational guidance only, not legal advice.</div>
     </div>
@@ -396,7 +473,7 @@ with tab_about:
     </div>
     <div class="hh-tl">
         <div class="item">
-            <div class="when">High school → college</div>
+            <div class="when">High school to college</div>
             <h4>Running crews, seeing the risk</h4>
             <p>Founder Matthew Richardson started and ran Mountain Mowers, an eight-person lawn care
             business. Managing a physical-labor crew made one thing obvious: the people doing the hardest
@@ -440,28 +517,19 @@ with tab_why:
     </div>
     """, unsafe_allow_html=True)
 
-    w1, w2, w3 = st.columns(3)
-    with w1:
-        st.markdown("""<div class="hh-card"><div class="icon">⏳</div>
-        <h3>Saves time</h3>
-        <p>Two minutes here replaces an hour of contradictory search results and forum threads from other states.</p></div>""", unsafe_allow_html=True)
-        st.markdown("""<div class="hh-card"><div class="icon">🧠</div>
-        <h3>Builds confidence</h3>
-        <p>Walking into a conversation with your employer or a doctor knowing your rights changes the entire dynamic.</p></div>""", unsafe_allow_html=True)
-    with w2:
-        st.markdown("""<div class="hh-card"><div class="icon">🎯</div>
-        <h3>State-specific</h3>
-        <p>Deadlines aren't generic. Your readout is built on your state's actual notice and filing windows.</p></div>""", unsafe_allow_html=True)
-        st.markdown("""<div class="hh-card"><div class="icon">🤝</div>
-        <h3>Honest triage</h3>
-        <p>Most tools upsell you a lawyer. HardHat tells you when you don't need one, and flags the signals when you do.</p></div>""", unsafe_allow_html=True)
-    with w3:
-        st.markdown("""<div class="hh-card"><div class="icon">📱</div>
-        <h3>Easy &amp; accessible</h3>
-        <p>Plain English, six dropdowns, works on a phone from the job site. No account, no email, no cost.</p></div>""", unsafe_allow_html=True)
-        st.markdown("""<div class="hh-card"><div class="icon">🔒</div>
-        <h3>Nothing to lose</h3>
-        <p>Your answers aren't sold or stored against your name. Ask the awkward questions freely.</p></div>""", unsafe_allow_html=True)
+    benefits = [
+        ("clock", "Saves time", "Two minutes here replaces an hour of contradictory search results and forum threads from other states."),
+        ("target", "State-specific", "Deadlines aren't generic. Your readout is built on your state's actual notice and filing windows."),
+        ("phone", "Easy and accessible", "Plain English, six dropdowns, works on a phone from the job site. No account, no email, no cost."),
+        ("trend", "Builds confidence", "Walking into a conversation with your employer or a doctor knowing your rights changes the entire dynamic."),
+        ("users", "Honest triage", "Most tools upsell you a lawyer. HardHat tells you when you don't need one, and flags the signals when you do."),
+        ("lock", "Nothing to lose", "Your answers aren't sold or stored against your name. Ask the awkward questions freely."),
+    ]
+    cols = st.columns(3)
+    for i, (ic, title, body) in enumerate(benefits):
+        with cols[i % 3]:
+            st.markdown(f"""<div class="hh-card"><div class="icon">{icon(ic)}</div>
+            <h3>{title}</h3><p>{body}</p></div>""", unsafe_allow_html=True)
 
 
 # ============================================================
@@ -477,29 +545,15 @@ with tab_purpose:
 
     p1, p2 = st.columns(2)
     with p1:
-        st.markdown("""<div class="hh-card">
-        <span class="hh-pill warn">The problem</span>
-        <h3>Coverage without comprehension</h3>
-        <p>Workers' comp is mandatory for nearly every employer, yet the process is opaque enough that
-        injured workers miss deadlines, under-report, or never file. The cost of confusion falls entirely
-        on the person least equipped to absorb it.</p></div>""", unsafe_allow_html=True)
-        st.markdown("""<div class="hh-card">
-        <span class="hh-pill blue">Who it's for</span>
-        <h3>Blue-collar workers first</h3>
-        <p>Construction, manufacturing, warehousing, landscaping: the industries where injuries are most
-        common and legal help feels furthest away. (Office workers are covered too, and many don't know it.)</p></div>""", unsafe_allow_html=True)
+        card("warn", "The problem", "alert", "Coverage without comprehension",
+             "<p>Workers' comp is mandatory for nearly every employer, yet the process is opaque enough that injured workers miss deadlines, under-report, or never file. The cost of confusion falls entirely on the person least equipped to absorb it.</p>", WARN)
+        card("blue", "Who it's for", "users", "Blue-collar workers first",
+             "<p>Construction, manufacturing, warehousing, landscaping: the industries where injuries are most common and legal help feels furthest away. (Office workers are covered too, and many don't know it.)</p>")
     with p2:
-        st.markdown("""<div class="hh-card">
-        <span class="hh-pill good">How it helps</span>
-        <h3>Readout, deadlines, action plan</h3>
-        <p>In one pass: whether you likely have a valid claim, the exact notice and filing windows in your
-        state, your next three steps, and an honest call on whether your situation needs an attorney.</p></div>""", unsafe_allow_html=True)
-        st.markdown("""<div class="hh-card">
-        <span class="hh-pill blue">What makes it different</span>
-        <h3>Guidance, not lead-gen</h3>
-        <p>Most sites in this space exist to sell your contact info to law firms. HardHat's default answer
-        is "you can handle this yourself," escalating only when the signals genuinely warrant it. Trust is
-        the product.</p></div>""", unsafe_allow_html=True)
+        card("good", "How it helps", "compass", "Readout, deadlines, action plan",
+             "<p>In one pass: whether you likely have a valid claim, the exact notice and filing windows in your state, your next three steps, and an honest call on whether your situation needs an attorney.</p>", GOOD)
+        card("blue", "What makes it different", "shield", "Guidance, not lead-gen",
+             "<p>Most sites in this space exist to sell your contact info to law firms. HardHat's default answer is \"you can handle this yourself,\" escalating only when the signals genuinely warrant it. Trust is the product.</p>")
 
 
 # ============================================================
@@ -534,11 +588,11 @@ with tab_checker:
             ["Still working, pushing through it", "On light duty", "Off work, no pay coming in",
              "My claim was denied", "I think I'm being punished for reporting", "The injury looks permanent"])
 
-        submitted = st.form_submit_button("Check my situation →")
+        submitted = st.form_submit_button("Check my situation")
 
     if submitted:
         with st.spinner("Building your readout..."):
-            time.sleep(0.9)  # brief, deliberate pause so the readout feels generated, not instant
+            time.sleep(0.9)  # deliberate beat so the readout feels generated
 
         rules = STATE_RULES[state]
 
@@ -562,7 +616,7 @@ with tab_checker:
             confidence -= 10
         elif reported == "No, not yet":
             confidence -= 20
-        if timing in ("6-12 months ago",):
+        if timing == "6-12 months ago":
             confidence -= 10
         elif timing == "More than a year ago":
             confidence -= 25
@@ -571,30 +625,24 @@ with tab_checker:
         confidence = max(confidence, 25)
 
         if likely:
-            st.markdown(f"""<div class="hh-card">
-            <span class="hh-pill good">Claim viability</span>
-            <h3>✅ You likely have a valid claim</h3>
-            <p>Nearly every employer in {state if state != 'Other / not listed' else 'the U.S.'} is required to carry workers' compensation coverage.
-            An injury that happened at work or because of work is generally covered, including {injury.lower().split('(')[0].strip()} injuries.
-            You do <b>NOT</b> have to prove your employer did anything wrong. Comp is no-fault.</p></div>""", unsafe_allow_html=True)
+            card("good", "Claim viability", "check", "You likely have a valid claim",
+                 f"<p>Nearly every employer in {state if state != 'Other / not listed' else 'the U.S.'} is required to carry workers' compensation coverage. "
+                 f"An injury that happened at work or because of work is generally covered, including {injury.lower().split('(')[0].strip()} injuries. "
+                 f"You do <b>NOT</b> have to prove your employer did anything wrong. Comp is no-fault.</p>", GOOD)
         else:
-            st.markdown("""<div class="hh-card">
-            <span class="hh-pill warn">Claim viability</span>
-            <h3>⚠️ Your window may be closing or closed</h3>
-            <p>Based on the timing you selected, the standard filing deadline may have passed. There are exceptions (late discovery, employer misconduct, ongoing benefits), so don't assume it's over. Talk to someone.</p></div>""", unsafe_allow_html=True)
+            card("warn", "Claim viability", "alert", "Your window may be closing or closed",
+                 "<p>Based on the timing you selected, the standard filing deadline may have passed. There are exceptions (late discovery, employer misconduct, ongoing benefits), so don't assume it's over. Talk to someone.</p>", WARN)
 
         st.markdown(f"""<div class="hh-card">
         <span class="hh-pill blue">Readout confidence</span>
-        <h3>{confidence}%</h3>
+        <div class="hh-rhead">{icon("trend")}<h3>{confidence}%</h3></div>
+        <div class="hh-bar"><div class="fill" style="width:{confidence}%;"></div></div>
         <p>How well your answers match the situations this readout is built for. Prompt written reporting,
         recent timing, and a covered state raise it; missing details lower it. It is <b>not</b> a prediction
         of your claim's outcome.</p></div>""", unsafe_allow_html=True)
 
         # ---- 2. Deadlines ----
-        st.markdown(f"""<div class="hh-card">
-        <span class="hh-pill blue">{state}</span>
-        <h3>⏰ Deadlines in your state</h3>
-        <p>{rules['note']}</p></div>""", unsafe_allow_html=True)
+        card("blue", state, "clock", "Deadlines in your state", f"<p>{rules['note']}</p>")
 
         # ---- 3. Next 3 steps ----
         steps = []
@@ -606,25 +654,19 @@ with tab_checker:
             steps.append("Keep every document: medical bills, work restrictions, pay stubs showing missed time.")
 
         steps_html = "".join([f"<p><b>{i+1}.</b> {s}</p>" for i, s in enumerate(steps[:3])])
-        st.markdown(f"""<div class="hh-card">
-        <span class="hh-pill blue">Action plan</span>
-        <h3>👉 Your next 3 steps</h3>{steps_html}</div>""", unsafe_allow_html=True)
+        card("blue", "Action plan", "clipboard", "Your next 3 steps", steps_html)
 
         # ---- 4. Attorney trigger ----
         complex_flags = {"My claim was denied", "I think I'm being punished for reporting", "The injury looks permanent"}
         if status in complex_flags or not likely:
-            st.markdown("""<div class="hh-card">
-            <span class="hh-pill warn">Representation advised</span>
-            <h3>⚖️ Talk to an attorney. Seriously.</h3>
-            <p>Your situation shows the signals (denial, retaliation, permanent injury, or deadline risk) where workers who get representation
-            do meaningfully better. Workers' comp attorneys work on contingency: free consult, no fee unless you recover.
-            In the full HardHat product, this is where we'd match you with a vetted attorney in your state.</p></div>""", unsafe_allow_html=True)
+            card("warn", "Representation advised", "briefcase", "Talk to an attorney. Seriously.",
+                 "<p>Your situation shows the signals (denial, retaliation, permanent injury, or deadline risk) where workers who get representation "
+                 "do meaningfully better. Workers' comp attorneys work on contingency: free consult, no fee unless you recover. "
+                 "In the full HardHat product, this is where we'd match you with a vetted attorney in your state.</p>", WARN)
         else:
-            st.markdown("""<div class="hh-card">
-            <span class="hh-pill good">You've got this</span>
-            <h3>💪 You can likely handle this stage yourself</h3>
-            <p>Straightforward, reported, recent claims usually don't need a lawyer. If your claim gets denied, payments stop,
-            or your employer pushes back, that's when to get one. HardHat will be here for that moment.</p></div>""", unsafe_allow_html=True)
+            card("good", "You've got this", "shield", "You can likely handle this stage yourself",
+                 "<p>Straightforward, reported, recent claims usually don't need a lawyer. If your claim gets denied, payments stop, "
+                 "or your employer pushes back, that's when to get one. HardHat will be here for that moment.</p>", GOOD)
 
         if caveats:
             st.markdown("**Worth knowing:**")
@@ -638,53 +680,61 @@ with tab_checker:
 
 
 # ============================================================
-# SUCCESS STORIES  (clearly labeled illustrative pilot scenarios)
+# SUCCESS STORIES  (honest: pilot in progress, no invented claims)
 # ============================================================
 with tab_stories:
     st.markdown("""
     <div class="hh-section">
         <div class="hh-kicker">Success stories</div>
-        <div class="hh-h2">What a good outcome looks like.</div>
-        <p class="hh-lede">HardHat is in its pilot phase, so these are <b>illustrative scenarios</b> built
-        from the situations the Claim Checker is designed to handle — shown here so you can see how a
-        readout translates into a real-world result. They are composites, not client records.</p>
+        <div class="hh-h2">This page is earned, not written.</div>
+        <p class="hh-lede">HardHat is in its pilot phase. Rather than invent testimonials, we're leaving this
+        space open for the real ones. As pilot users complete readouts and report back, verified outcomes
+        will appear here with their permission.</p>
     </div>
     """, unsafe_allow_html=True)
 
-    filter_choice = st.selectbox("Filter scenarios", ["All", "Handled solo", "Attorney matched", "Deadline saved"])
+    g1, g2 = st.columns(2)
+    with g1:
+        st.markdown(f"""<div class="hh-card ghost">
+        <div>{icon("hardhat", MUTED, 28)}</div>
+        <h4 style="margin-top:12px;">Your story could be here</h4>
+        <p>Used the Claim Checker and it helped? We'd like to hear how it went.</p>
+        <span class="hh-pill grey" style="margin: 8px auto 0;">Coming soon</span>
+        </div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="hh-card ghost">
+        <div>{icon("clock", MUTED, 28)}</div>
+        <h4 style="margin-top:12px;">Deadline saved</h4>
+        <p>Reserved for the first pilot user whose notice window was still open because they checked in time.</p>
+        <span class="hh-pill grey" style="margin: 8px auto 0;">Coming soon</span>
+        </div>""", unsafe_allow_html=True)
+    with g2:
+        st.markdown(f"""<div class="hh-card ghost">
+        <div>{icon("check", MUTED, 28)}</div>
+        <h4 style="margin-top:12px;">First accepted claim</h4>
+        <p>Reserved for the first pilot user who reported, filed, and had their claim accepted after a readout.</p>
+        <span class="hh-pill grey" style="margin: 8px auto 0;">Coming soon</span>
+        </div>""", unsafe_allow_html=True)
+        st.markdown(f"""<div class="hh-card ghost">
+        <div>{icon("briefcase", MUTED, 28)}</div>
+        <h4 style="margin-top:12px;">Right call on representation</h4>
+        <p>Reserved for the first pilot user whose readout correctly flagged that their situation needed an attorney.</p>
+        <span class="hh-pill grey" style="margin: 8px auto 0;">Coming soon</span>
+        </div>""", unsafe_allow_html=True)
 
-    STORIES = [
-        {"tag": "Handled solo", "pill": "good", "title": "Warehouse back strain · Tennessee",
-         "text": "A picker strained his back lifting a pallet and almost 'pushed through it.' The readout flagged Tennessee's 15-day written notice window. He reported by email that afternoon, saw an approved provider, and his claim was accepted without a dispute.",
-         "date": "Scenario · Spring 2026"},
-        {"tag": "Deadline saved", "pill": "blue", "title": "Landscaping laceration · Georgia",
-         "text": "A crew member cut his hand three weeks after the fact and assumed it was too late. The readout showed Georgia's 30-day notice window was still open — barely. Written notice went in on day 26, keeping the claim alive.",
-         "date": "Scenario · Spring 2026"},
-        {"tag": "Attorney matched", "pill": "warn", "title": "Denied claim · North Carolina",
-         "text": "A machine operator's repetitive-stress claim was denied as 'not work-related.' The readout flagged denial as an escalation signal and pointed her to a contingency attorney. Represented workers in her position routinely see denials reversed on appeal.",
-         "date": "Scenario · Spring 2026"},
-        {"tag": "Handled solo", "pill": "good", "title": "Office fall · Tennessee",
-         "text": "An admin slipped in a stairwell and assumed comp was 'only for job sites.' The readout corrected the myth, walked her through written notice, and the medical bills were covered — no lawyer, no drama.",
-         "date": "Scenario · Summer 2026"},
-    ]
-
-    cols = st.columns(2)
-    shown = [s for s in STORIES if filter_choice == "All" or s["tag"] == filter_choice]
-    if not shown:
-        st.caption("No scenarios match that filter yet.")
-    for i, s in enumerate(shown):
-        with cols[i % 2]:
-            st.markdown(f"""<div class="hh-card">
-            <span class="hh-pill {s['pill']}">{s['tag']}</span>
-            <h3>{s['title']}</h3>
-            <p>{s['text']}</p>
-            <p style="font-size:12px; letter-spacing:0.06em; text-transform:uppercase;">{s['date']}</p>
-            </div>""", unsafe_allow_html=True)
+    st.markdown("""
+    <div class="hh-section">
+        <div class="hh-kicker">In the meantime</div>
+        <div class="hh-h2">Help write this page.</div>
+        <p class="hh-lede">Run the Claim Checker, rate your readout, and if it moved your situation forward,
+        tell us. The pilot's entire purpose is finding out whether guided answers beat an hour of Googling,
+        and this page is where the evidence will live.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.markdown("""
 <div class="hh-footer">
-    <div class="logo">🪖 HardHat</div>
-    <div>© 2026 HardHat · MVP v0.2 · Built by Matthew Richardson · ENT 451, University of Tennessee</div>
+    <div class="logo">HardHat</div>
+    <div>© 2026 HardHat · MVP v0.3 · Built by Matthew Richardson · ENT 451, University of Tennessee</div>
     <div>Informational guidance only, not legal advice.</div>
 </div>
 """, unsafe_allow_html=True)
