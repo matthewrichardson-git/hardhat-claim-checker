@@ -2,187 +2,230 @@ import streamlit as st
 
 st.set_page_config(page_title="HardHat Claim Checker", page_icon="🪖", layout="centered")
 
-# ---------------- DESIGN TOKENS ----------------
-# "Site Diagnostics Terminal" — industrial-futurist, safety-orange on deep graphite
-INK = "#0A0F1E"        # page base
-PANEL = "#111A30"      # card surface
-PANEL_2 = "#0E1628"    # inset surface
-LINE = "#22304F"       # hairline borders
-ORANGE = "#FF8A00"     # signal / brand
-ORANGE_DIM = "#B35F00"
-TEXT = "#E8ECF4"
-MUTED = "#8A94AD"
-RED = "#FF4D4D"
-GREEN = "#3DDC97"
+# ============================================================
+# DESIGN SYSTEM — "HardHat, by way of Cupertino"
+# Rich black base, glass surfaces, one electric-blue accent,
+# Inter typography, 8px spacing grid, purposeful motion.
+# All assignment functionality preserved exactly.
+# ============================================================
+BG = "#09090B"          # rich black
+SURFACE = "rgba(255,255,255,0.04)"   # glass card
+BORDER = "rgba(255,255,255,0.08)"
+TEXT = "#FAFAFA"
+MUTED = "#9CA0AB"
+ACCENT = "#4D9FFF"      # electric blue
+ACCENT_2 = "#38E1D4"    # cyan (gradient partner, used sparingly)
+GOOD = "#30D158"
+WARN = "#FF6B6B"
 
 st.markdown(f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* ---------- base ---------- */
+/* ---------- foundation ---------- */
 .stApp {{
     background:
-        radial-gradient(1100px 500px at 50% -10%, rgba(255,138,0,0.07), transparent 60%),
-        linear-gradient(180deg, #0B1122 0%, {INK} 40%);
+        radial-gradient(900px 480px at 80% -10%, rgba(77,159,255,0.10), transparent 60%),
+        radial-gradient(700px 420px at 0% 10%, rgba(56,225,212,0.06), transparent 55%),
+        {BG};
     color: {TEXT};
 }}
-html, body, [class*="css"] {{ font-family: 'Inter', sans-serif; }}
-h1, h2, h3 {{
-    font-family: 'Chakra Petch', sans-serif !important;
-    color: {TEXT} !important;
-    letter-spacing: 0.02em;
+html, body, [class*="css"] {{
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    -webkit-font-smoothing: antialiased;
 }}
+h1, h2, h3 {{ color: {TEXT} !important; letter-spacing: -0.02em; }}
+h2 {{ font-weight: 700; font-size: 28px; margin-top: 8px; }}
+h3 {{ font-weight: 600; }}
 p, li, label {{ color: {TEXT}; }}
-hr {{ border-color: {LINE}; }}
+hr {{ border-color: {BORDER}; margin: 32px 0; }}
+.block-container {{ padding-top: 48px; max-width: 720px; }}
 
-/* ---------- banner ---------- */
-.hh-banner {{
-    position: relative;
-    background: linear-gradient(135deg, {PANEL} 0%, {PANEL_2} 100%);
-    border: 1px solid {LINE};
-    border-top: 2px solid {ORANGE};
-    border-radius: 14px;
-    padding: 30px 32px 26px;
-    margin-bottom: 22px;
-    overflow: hidden;
+/* ---------- motion ---------- */
+@keyframes riseIn {{
+    from {{ opacity: 0; transform: translateY(16px); }}
+    to   {{ opacity: 1; transform: translateY(0); }}
 }}
-.hh-banner::after {{
-    content: "";
-    position: absolute; inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255,138,0,0.10), transparent);
-    transform: translateX(-100%);
-    animation: hh-sweep 5s ease-in-out infinite;
-    pointer-events: none;
-}}
-@keyframes hh-sweep {{
-    0%   {{ transform: translateX(-100%); }}
-    45%  {{ transform: translateX(100%); }}
-    100% {{ transform: translateX(100%); }}
+@keyframes floatGlow {{
+    0%, 100% {{ opacity: 0.55; transform: translateY(0); }}
+    50%      {{ opacity: 0.9;  transform: translateY(-6px); }}
 }}
 @media (prefers-reduced-motion: reduce) {{
-    .hh-banner::after {{ animation: none; }}
+    * {{ animation: none !important; transition: none !important; }}
+}}
+
+/* ---------- hero ---------- */
+.hh-hero {{
+    position: relative;
+    padding: 56px 8px 40px;
+    text-align: center;
+    animation: riseIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}}
+.hh-hero .orb {{
+    position: absolute; top: -8px; left: 50%;
+    width: 220px; height: 220px; transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(77,159,255,0.22), transparent 65%);
+    filter: blur(28px);
+    animation: floatGlow 7s ease-in-out infinite;
+    pointer-events: none;
 }}
 .hh-eyebrow {{
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.22em;
-    color: {ORANGE};
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    margin: 0 0 8px 0;
+    color: {ACCENT};
+    background: rgba(77,159,255,0.10);
+    border: 1px solid rgba(77,159,255,0.25);
+    border-radius: 100px;
+    padding: 6px 14px;
+    margin-bottom: 20px;
 }}
-.hh-banner h1 {{
-    color: {TEXT} !important;
-    margin: 0;
-    font-size: 34px;
-    font-weight: 700;
-    line-height: 1.1;
+.hh-hero h1 {{
+    font-size: 46px;
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+    margin: 0 0 16px;
+    background: linear-gradient(180deg, {TEXT} 60%, #B9BDC7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }}
-.hh-banner .hh-sub {{
+.hh-hero .sub {{
+    font-size: 17px;
     color: {MUTED};
-    margin: 10px 0 0 0;
-    font-size: 15px;
+    max-width: 460px;
+    margin: 0 auto;
+    line-height: 1.6;
 }}
-.hh-banner .hh-sub b {{ color: {TEXT}; }}
+.hh-hero .sub b {{ color: {TEXT}; font-weight: 600; }}
+@media (max-width: 640px) {{
+    .hh-hero h1 {{ font-size: 34px; }}
+    .hh-hero {{ padding: 40px 0 32px; }}
+}}
 
-/* ---------- readout cards (signature element) ---------- */
-.hh-result {{
-    position: relative;
-    background: {PANEL};
-    border: 1px solid {LINE};
-    border-radius: 10px;
-    padding: 20px 24px 18px;
-    margin: 14px 0;
+/* ---------- glass cards ---------- */
+.hh-card {{
+    background: {SURFACE};
+    border: 1px solid {BORDER};
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin: 16px 0;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    animation: riseIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }}
-.hh-result::before {{
-    /* corner bracket, top-left */
-    content: "";
-    position: absolute; top: -1px; left: -1px;
-    width: 22px; height: 22px;
-    border-top: 2px solid {ORANGE};
-    border-left: 2px solid {ORANGE};
-    border-top-left-radius: 10px;
+.hh-card:hover {{
+    transform: translateY(-3px);
+    border-color: rgba(77,159,255,0.35);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.45);
 }}
-.hh-result::after {{
-    /* corner bracket, bottom-right */
-    content: "";
-    position: absolute; bottom: -1px; right: -1px;
-    width: 22px; height: 22px;
-    border-bottom: 2px solid {ORANGE};
-    border-right: 2px solid {ORANGE};
-    border-bottom-right-radius: 10px;
-}}
-.hh-result.hh-alert::before, .hh-result.hh-alert::after {{ border-color: {RED}; }}
-.hh-result.hh-ok::before, .hh-result.hh-ok::after {{ border-color: {GREEN}; }}
-.hh-tag {{
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10.5px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: {MUTED};
-    margin: 0 0 6px 0;
-}}
-.hh-tag span {{ color: {ORANGE}; }}
-.hh-result.hh-alert .hh-tag span {{ color: {RED}; }}
-.hh-result.hh-ok .hh-tag span {{ color: {GREEN}; }}
-.hh-result h3 {{
-    margin: 0 0 8px 0;
+.hh-card:nth-of-type(2) {{ animation-delay: 0.08s; }}
+.hh-card:nth-of-type(3) {{ animation-delay: 0.16s; }}
+.hh-card:nth-of-type(4) {{ animation-delay: 0.24s; }}
+.hh-card h3 {{
     font-size: 19px;
+    margin: 0 0 10px;
 }}
-.hh-result p {{ color: {MUTED}; margin: 6px 0; line-height: 1.55; }}
-.hh-result p b {{ color: {TEXT}; }}
+.hh-card p {{
+    color: {MUTED};
+    font-size: 15px;
+    line-height: 1.65;
+    margin: 8px 0;
+}}
+.hh-card p b {{ color: {TEXT}; font-weight: 600; }}
+.hh-pill {{
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    border-radius: 100px;
+    padding: 4px 12px;
+    margin-bottom: 12px;
+}}
+.hh-pill.blue  {{ color: {ACCENT}; background: rgba(77,159,255,0.10); border: 1px solid rgba(77,159,255,0.25); }}
+.hh-pill.good  {{ color: {GOOD};   background: rgba(48,209,88,0.10);  border: 1px solid rgba(48,209,88,0.25); }}
+.hh-pill.warn  {{ color: {WARN};   background: rgba(255,107,107,0.10); border: 1px solid rgba(255,107,107,0.28); }}
 
 /* ---------- form ---------- */
 [data-testid="stForm"] {{
-    background: {PANEL_2};
-    border: 1px solid {LINE};
-    border-radius: 14px;
-    padding: 26px 26px 20px;
+    background: {SURFACE};
+    border: 1px solid {BORDER};
+    border-radius: 24px;
+    padding: 32px 32px 24px;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    animation: riseIn 0.7s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
 }}
-.stSelectbox label, .stRadio label, .stSlider label {{
+[data-testid="stForm"] h3 {{
+    font-size: 22px;
+    letter-spacing: -0.02em;
+}}
+.stSelectbox label, .stRadio > label, .stSlider label {{
     color: {MUTED} !important;
-    font-weight: 500;
+    font-size: 14px !important;
+    font-weight: 500 !important;
 }}
 [data-baseweb="select"] > div {{
-    background: {PANEL} !important;
-    border-color: {LINE} !important;
+    background: rgba(255,255,255,0.05) !important;
+    border-color: {BORDER} !important;
+    border-radius: 12px !important;
     color: {TEXT} !important;
+    transition: border-color 0.2s ease;
 }}
+[data-baseweb="select"] > div:hover {{ border-color: rgba(77,159,255,0.4) !important; }}
 .stRadio [role="radiogroup"] label {{ color: {TEXT} !important; }}
 
 /* ---------- buttons ---------- */
 .stButton>button, [data-testid="stForm"] button {{
-    background: linear-gradient(180deg, {ORANGE}, {ORANGE_DIM});
-    color: {INK};
-    font-family: 'Chakra Petch', sans-serif;
+    background: linear-gradient(135deg, {ACCENT}, {ACCENT_2});
+    color: #05070D;
+    font-family: 'Inter', sans-serif;
     font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
+    font-size: 15px;
+    letter-spacing: -0.01em;
     border: none;
-    padding: 12px 30px;
-    border-radius: 8px;
-    box-shadow: 0 0 18px rgba(255,138,0,0.35);
-    transition: box-shadow 0.2s ease, transform 0.1s ease;
+    padding: 12px 32px;
+    border-radius: 100px;
+    box-shadow: 0 4px 20px rgba(77,159,255,0.35);
+    transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }}
 .stButton>button:hover, [data-testid="stForm"] button:hover {{
-    box-shadow: 0 0 28px rgba(255,138,0,0.55);
-    transform: translateY(-1px);
-    color: {INK};
+    transform: scale(1.03);
+    box-shadow: 0 6px 28px rgba(77,159,255,0.5);
+    filter: brightness(1.05);
+    color: #05070D;
 }}
-.stButton>button:focus-visible {{
+.stButton>button:active, [data-testid="stForm"] button:active {{ transform: scale(0.98); }}
+.stButton>button:focus-visible, [data-testid="stForm"] button:focus-visible {{
     outline: 2px solid {TEXT};
-    outline-offset: 2px;
+    outline-offset: 3px;
 }}
 
-/* ---------- misc ---------- */
-.stCaption, [data-testid="stCaptionContainer"] p {{ color: {MUTED} !important; }}
+/* ---------- slider + captions ---------- */
+.stSlider [data-baseweb="slider"] div[role="slider"] {{
+    background: {ACCENT};
+    box-shadow: 0 0 0 4px rgba(77,159,255,0.25);
+}}
+.stCaption, [data-testid="stCaptionContainer"] p {{
+    color: {MUTED} !important;
+    font-size: 13px !important;
+}}
 </style>
 """, unsafe_allow_html=True)
 
+# ---------------- HERO ----------------
 st.markdown("""
-<div class="hh-banner">
-    <p class="hh-eyebrow">HardHat // Claim Diagnostics</p>
-    <h1>🪖 HardHat Claim Checker</h1>
-    <p class="hh-sub">Workers' comp, made clear. <b>Answer 6 quick questions</b> and get your readout.</p>
+<div class="hh-hero">
+    <div class="orb"></div>
+    <span class="hh-eyebrow">HardHat 🪖 Claim Checker</span>
+    <h1>Workers' comp,<br>made clear.</h1>
+    <p class="sub">Six quick questions. One clear readout on your claim, your deadlines, and your next move. <b>No jargon, no runaround.</b></p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -241,21 +284,21 @@ if submitted:
         caveats.append("Office injuries are absolutely covered too. Workers' comp isn't just for job sites.")
 
     if likely:
-        st.markdown(f"""<div class="hh-result hh-ok">
-        <p class="hh-tag">Status // <span>Claim viability</span></p>
+        st.markdown(f"""<div class="hh-card">
+        <span class="hh-pill good">Claim viability</span>
         <h3>✅ You likely have a valid claim</h3>
         <p>Nearly every employer in {state if state != 'Other / not listed' else 'the U.S.'} is required to carry workers' compensation coverage.
         An injury that happened at work or because of work is generally covered, including {injury.lower().split('(')[0].strip()} injuries.
         You do <b>NOT</b> have to prove your employer did anything wrong. Comp is no-fault.</p></div>""", unsafe_allow_html=True)
     else:
-        st.markdown("""<div class="hh-result hh-alert">
-        <p class="hh-tag">Status // <span>Claim viability</span></p>
+        st.markdown("""<div class="hh-card">
+        <span class="hh-pill warn">Claim viability</span>
         <h3>⚠️ Your window may be closing or closed</h3>
         <p>Based on the timing you selected, the standard filing deadline may have passed. There are exceptions (late discovery, employer misconduct, ongoing benefits), so don't assume it's over. Talk to someone.</p></div>""", unsafe_allow_html=True)
 
     # ---- 2. Deadlines ----
-    st.markdown(f"""<div class="hh-result">
-    <p class="hh-tag">Timeline // <span>{state}</span></p>
+    st.markdown(f"""<div class="hh-card">
+    <span class="hh-pill blue">{state}</span>
     <h3>⏰ Deadlines in your state</h3>
     <p>{rules['note']}</p></div>""", unsafe_allow_html=True)
 
@@ -269,22 +312,22 @@ if submitted:
         steps.append("Keep every document: medical bills, work restrictions, pay stubs showing missed time.")
 
     steps_html = "".join([f"<p><b>{i+1}.</b> {s}</p>" for i, s in enumerate(steps[:3])])
-    st.markdown(f"""<div class="hh-result">
-    <p class="hh-tag">Action plan // <span>Next 72 hours</span></p>
+    st.markdown(f"""<div class="hh-card">
+    <span class="hh-pill blue">Action plan</span>
     <h3>👉 Your next 3 steps</h3>{steps_html}</div>""", unsafe_allow_html=True)
 
     # ---- 4. Attorney trigger ----
     complex_flags = {"My claim was denied", "I think I'm being punished for reporting", "The injury looks permanent"}
     if status in complex_flags or not likely:
-        st.markdown("""<div class="hh-result hh-alert">
-        <p class="hh-tag">Escalation // <span>Representation advised</span></p>
+        st.markdown("""<div class="hh-card">
+        <span class="hh-pill warn">Representation advised</span>
         <h3>⚖️ Talk to an attorney. Seriously.</h3>
         <p>Your situation shows the signals (denial, retaliation, permanent injury, or deadline risk) where workers who get representation
         do meaningfully better. Workers' comp attorneys work on contingency: free consult, no fee unless you recover.
         In the full HardHat product, this is where we'd match you with a vetted attorney in your state.</p></div>""", unsafe_allow_html=True)
     else:
-        st.markdown("""<div class="hh-result hh-ok">
-        <p class="hh-tag">Escalation // <span>Not needed yet</span></p>
+        st.markdown("""<div class="hh-card">
+        <span class="hh-pill good">You've got this</span>
         <h3>💪 You can likely handle this stage yourself</h3>
         <p>Straightforward, reported, recent claims usually don't need a lawyer. If your claim gets denied, payments stop,
         or your employer pushes back, that's when to get one. HardHat will be here for that moment.</p></div>""", unsafe_allow_html=True)
